@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Zagdim Office — Preview</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#1a1a2e; font-family:'Segoe UI',sans-serif; overflow:hidden; height:100vh; }
+
+  /* ── LOGIN SCREEN ── */
+  #login {
+    position:fixed; inset:0;
+    background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .card {
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:24px;
+    padding:40px 48px;
+    width:480px; max-width:90vw;
+    box-shadow:0 24px 64px rgba(0,0,0,0.4);
+  }
+  .card h1 { color:#fff; font-size:32px; font-weight:700; text-align:center; margin-bottom:6px; }
+  .card p  { color:rgba(255,255,255,0.5); text-align:center; margin-bottom:32px; font-size:14px; }
+  label    { color:rgba(255,255,255,0.7); font-size:13px; font-weight:600; display:block; margin-bottom:6px; }
+  input[type=text], input[type=password] {
+    width:100%; background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.15); border-radius:10px;
+    padding:12px 16px; color:#fff; font-size:16px; outline:none; margin-bottom:20px;
+  }
+  input::placeholder { color:rgba(255,255,255,0.3); }
+  .avatar-grid {
+    display:grid; grid-template-columns:repeat(6,1fr); gap:8px;
+    margin-bottom:28px; margin-top:8px;
+  }
+  .av-btn {
+    aspect-ratio:1; border-radius:12px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    border:3px solid transparent; transition:transform 0.15s, border 0.15s;
+    font-size:24px;
+  }
+  .av-btn.selected { border-color:#6C63FF; transform:scale(1.15); }
+  .join-btn {
+    width:100%; background:linear-gradient(135deg,#6C63FF,#3ECFCF);
+    border:none; border-radius:12px; padding:14px;
+    color:#fff; font-size:16px; font-weight:700; cursor:pointer; letter-spacing:0.3px;
+  }
+  .join-btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .error-banner {
+    background:rgba(255,80,80,0.15); border:1px solid rgba(255,80,80,0.3);
+    border-radius:10px; padding:10px 14px; color:#ff8080;
+    font-size:13px; margin-bottom:16px; text-align:center; display:none;
+  }
+
+  /* ── GAME SCREEN ── */
+  #game { position:fixed; inset:0; display:none; flex-direction:column; }
+  #game-wrap {
+    flex:1; display:flex; align-items:center; justify-content:center;
+    background:#0d0d1a; padding-bottom:52px;
+  }
+  canvas {
+    max-width:100%; max-height:100%;
+    border-radius:8px; box-shadow:0 0 80px rgba(108,99,255,0.15);
+  }
+
+  /* ── STATUS BAR ── */
+  #statusbar {
+    position:fixed; bottom:0; left:0; right:0;
+    background:rgba(10,10,25,0.88); backdrop-filter:blur(12px);
+    border-top:1px solid rgba(255,255,255,0.08);
+    display:flex; align-items:center; gap:12px;
+    padding:10px 20px; z-index:50; height:52px;
+  }
+  #statusbar .uname { color:#fff; font-weight:700; font-size:14px; }
+  #status-btn {
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+    border-radius:8px; padding:5px 12px; color:rgba(255,255,255,0.7);
+    font-size:13px; cursor:pointer;
+  }
+  #hint { margin-left:auto; color:rgba(255,255,255,0.3); font-size:12px; }
+
+  /* ── WAVE TOAST ── */
+  #wave-toast {
+    position:fixed; bottom:72px; right:24px;
+    background:rgba(20,20,40,0.92); backdrop-filter:blur(12px);
+    border:1px solid rgba(108,99,255,0.4); border-radius:16px;
+    padding:14px 18px; display:none; gap:12px; align-items:flex-start;
+    min-width:260px; box-shadow:0 8px 32px rgba(0,0,0,0.5);
+    z-index:100; transition:opacity 0.3s;
+  }
+  #wave-toast .wv-emoji { font-size:28px; }
+  #wave-toast p { color:#fff; font-size:14px; margin-bottom:10px; }
+  .wv-walk {
+    background:linear-gradient(135deg,#6C63FF,#3ECFCF);
+    border:none; border-radius:8px; padding:6px 12px;
+    color:#fff; font-size:12px; font-weight:700; cursor:pointer; margin-right:6px;
+  }
+  .wv-dismiss {
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+    border-radius:8px; padding:6px 10px; color:rgba(255,255,255,0.6);
+    font-size:12px; cursor:pointer;
+  }
+
+  /* ── DEMO LABEL ── */
+  #demo-badge {
+    position:fixed; top:16px; right:16px;
+    background:rgba(108,99,255,0.25); border:1px solid rgba(108,99,255,0.5);
+    border-radius:20px; padding:6px 14px;
+    color:rgba(255,255,255,0.8); font-size:12px; font-weight:600; z-index:200;
+  }
+</style>
+</head>
+<body>
+
+<div id="demo-badge">👁 Static Preview</div>
+
+<!-- ══ LOGIN ══ -->
+<div id="login">
+  <div class="card">
+    <h1>Zagdim Office</h1>
+    <p>Pick your avatar and join the office</p>
+
+    <div class="error-banner" id="err">⚠️ Wrong password.</div>
+
+    <label>Your name</label>
+    <input type="text" id="inp-name" placeholder="e.g. Alison 🍕" maxlength="24"/>
+
+    <label>Room password</label>
+    <input type="password" id="inp-pass" placeholder="Ask your team lead"/>
+
+    <label>Choose your avatar</label>
+    <div class="avatar-grid" id="avatar-grid"></div>
+
+    <button class="join-btn" id="join-btn" onclick="doJoin()">Enter Office →</button>
+  </div>
+</div>
+
+<!-- ══ GAME ══ -->
+<div id="game">
+  <div id="game-wrap">
+    <canvas id="c" width="1280" height="720"></canvas>
+  </div>
+  <div id="statusbar">
+    <span class="uname" id="sb-name"></span>
+    <button id="status-btn" onclick="cycleStatus()">+ status</button>
+    <span id="hint">WASD / ↑↓←→ to move &nbsp;·&nbsp; Click a player to wave</span>
+  </div>
+</div>
+
+<!-- ══ WAVE TOAST ══ -->
+<div id="wave-toast">
+  <span class="wv-emoji">👋</span>
+  <div>
+    <p id="wave-text"><strong>Brad</strong> waved at you!</p>
+    <button class="wv-walk" onclick="dismissWave()">Walk over →</button>
+    <button class="wv-dismiss" onclick="dismissWave()">Dismiss</button>
+  </div>
+</div>
+
+<script>
+// ── AVATARS ───────────────────────────────────────────────────────────────────
+const AVATARS = [
+  {id:'cat',     emoji:'🐱', color:'#FFD6A5'},
+  {id:'dog',     emoji:'🐶', color:'#CAFFBF'},
+  {id:'fox',     emoji:'🦊', color:'#FFADAD'},
+  {id:'bear',    emoji:'🐻', color:'#BDE0FE'},
+  {id:'panda',   emoji:'🐼', color:'#E9C46A'},
+  {id:'bunny',   emoji:'🐰', color:'#FFC8DD'},
+  {id:'frog',    emoji:'🐸', color:'#B9FBC0'},
+  {id:'penguin', emoji:'🐧', color:'#A0C4FF'},
+  {id:'chick',   emoji:'🐥', color:'#FFF3B0'},
+  {id:'koala',   emoji:'🐨', color:'#D0F4DE'},
+  {id:'dino',    emoji:'🦖', color:'#C8F7C5'},
+  {id:'octopus', emoji:'🐙', color:'#F8C8D4'},
+];
+const AV_SIZE = 44;
+let selectedAvatar = AVATARS[0].id;
+
+// Build avatar grid
+const grid = document.getElementById('avatar-grid');
+AVATARS.forEach(av => {
+  const btn = document.createElement('button');
+  btn.className = 'av-btn' + (av.id === selectedAvatar ? ' selected' : '');
+  btn.style.background = av.color;
+  btn.textContent = av.emoji;
+  btn.title = av.id;
+  btn.onclick = () => {
+    document.querySelectorAll('.av-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedAvatar = av.id;
+  };
+  grid.appendChild(btn);
+});
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+function doJoin() {
+  const name = document.getElementById('inp-name').value.trim();
+  const pass = document.getElementById('inp-pass').value;
+  if (!name || !pass) return;
+
+  // Demo: treat "wrong" as anything that isn't "demo"
+  if (pass !== 'demo') {
+    const err = document.getElementById('err');
+    err.style.display = 'block';
+    err.textContent = '⚠️ Wrong password. (hint: type "demo" for this preview)';
+    return;
+  }
+
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('game').style.display = 'flex';
+  document.getElementById('sb-name').textContent = name;
+  startGame(name, selectedAvatar);
+}
+
+document.getElementById('inp-pass').addEventListener('keydown', e => { if(e.key==='Enter') doJoin(); });
+document.getElementById('inp-name').addEventListener('keydown', e => { if(e.key==='Enter') doJoin(); });
+
+// ── GAME ──────────────────────────────────────────────────────────────────────
+const SPEED = 3;
+const LERP  = 0.18;
+const W = 1280, H = 720;
+
+let self = null;
+let players = {};
+let keys = {};
+let emojiCache = {};
+let waveTimeout = null;
+const STATUSES = ['🎸','🍕','☕','💻','🔥','💤','🧠',''];
+let statusIdx = STATUSES.length - 1;
+
+function buildEmojiCache() {
+  AVATARS.forEach(({id, emoji, color}) => {
+    const off = document.createElement('canvas');
+    off.width = AV_SIZE + 8; off.height = AV_SIZE + 8;
+    const oc = off.getContext('2d');
+    const cx = (AV_SIZE+8)/2, cy = (AV_SIZE+8)/2;
+    oc.beginPath(); oc.arc(cx,cy,AV_SIZE/2,0,Math.PI*2);
+    oc.fillStyle = color; oc.fill();
+    oc.font = `${AV_SIZE*0.6}px serif`;
+    oc.textAlign='center'; oc.textBaseline='middle';
+    oc.fillText(emoji, cx, cy+1);
+    emojiCache[id] = off;
+  });
+}
+
+function startGame(name, avatarId) {
+  buildEmojiCache();
+
+  self = { id:'me', name, avatar:avatarId, x:220, y:220, status:'' };
+
+  // Fake teammates already in the office
+  players = {
+    'me': { ...self, renderX:220, renderY:220 },
+    'p1': { id:'p1', name:'Brad', avatar:'dog',  x:480, y:300, renderX:480, renderY:300, status:'🎸' },
+    'p2': { id:'p2', name:'Lena', avatar:'fox',  x:700, y:180, renderX:700, renderY:180, status:'☕' },
+    'p3': { id:'p3', name:'Omar', avatar:'bear', x:350, y:500, renderX:350, renderY:500, status:''  },
+    'p4': { id:'p4', name:'Yuki', avatar:'bunny',x:900, y:420, renderX:900, renderY:420, status:'💻'},
+  };
+
+  // Animate fake players gently
+  setInterval(() => {
+    ['p1','p2','p3','p4'].forEach(id => {
+      const p = players[id];
+      p.x += (Math.random()-0.5)*1.2;
+      p.y += (Math.random()-0.5)*1.2;
+      p.x = Math.max(22,Math.min(W-22,p.x));
+      p.y = Math.max(22,Math.min(H-22,p.y));
+    });
+  }, 80);
+
+  // Demo: wave notification after 3 seconds
+  setTimeout(() => showWave('Brad'), 3000);
+
+  window.addEventListener('keydown', e => {
+    keys[e.key] = true;
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
+  });
+  window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+  requestAnimationFrame(tick);
+}
+
+function drawMap(ctx) {
+  ctx.fillStyle='#1E1E35';
+  ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
+  for(let x=0;x<W;x+=64){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=64){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  const zones=[
+    {label:'💻 Product Team', x:180, y:140, w:280, h:160},
+    {label:'☕ Break Room',   x:900, y:120, w:260, h:160},
+    {label:'📋 Design Pod',   x:160, y:460, w:280, h:150},
+    {label:'📞 Quiet Zone',   x:900, y:440, w:260, h:150},
+  ];
+  ctx.font='bold 14px "Segoe UI",sans-serif';
+  ctx.textAlign='center';
+  zones.forEach(({label,x,y,w,h})=>{
+    ctx.fillStyle='rgba(255,255,255,0.04)';
+    ctx.beginPath();
+    ctx.roundRect(x-w/2,y-h/2,w,h,12);
+    ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.07)';ctx.lineWidth=1;
+    ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.22)';
+    ctx.fillText(label, x, y+6);
+  });
+}
+
+function drawPlayer(ctx, p, isSelf) {
+  const x=Math.round(p.renderX), y=Math.round(p.renderY);
+  const half=(AV_SIZE+8)/2;
+  const img = emojiCache[p.avatar] || emojiCache[AVATARS[0].id];
+
+  if(isSelf){
+    ctx.save(); ctx.shadowBlur=18; ctx.shadowColor='#6C63FF';
+    ctx.beginPath(); ctx.arc(x,y,AV_SIZE/2+4,0,Math.PI*2);
+    ctx.strokeStyle='#6C63FF'; ctx.lineWidth=2; ctx.stroke();
+    ctx.restore();
+  }
+
+  ctx.drawImage(img, x-half, y-half, AV_SIZE+8, AV_SIZE+8);
+
+  const label = p.status ? `${p.name}  ${p.status}` : p.name;
+  const tagY = y - AV_SIZE/2 - 8;
+  ctx.font='bold 12px "Segoe UI",sans-serif'; ctx.textAlign='center';
+  const tw = ctx.measureText(label).width;
+  const px=8, th=20;
+  ctx.fillStyle = isSelf ? 'rgba(108,99,255,0.85)' : 'rgba(10,10,30,0.78)';
+  ctx.beginPath();
+  ctx.roundRect(x-tw/2-px, tagY-th+4, tw+px*2, th, 6);
+  ctx.fill();
+  ctx.fillStyle='#fff'; ctx.fillText(label, x, tagY-1);
+}
+
+function tick() {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+
+  // Movement
+  let dx=0, dy=0;
+  if(keys['w']||keys['ArrowUp'])    dy-=SPEED;
+  if(keys['s']||keys['ArrowDown'])  dy+=SPEED;
+  if(keys['a']||keys['ArrowLeft'])  dx-=SPEED;
+  if(keys['d']||keys['ArrowRight']) dx+=SPEED;
+  if(dx&&dy){dx*=0.707;dy*=0.707;}
+  if(self){
+    self.x=Math.max(22,Math.min(W-22,self.x+dx));
+    self.y=Math.max(22,Math.min(H-22,self.y+dy));
+    const sp=players['me'];
+    if(sp){sp.x=self.x;sp.y=self.y;sp.renderX=self.x;sp.renderY=self.y;}
+  }
+
+  // Interpolate fake players
+  Object.values(players).forEach(p=>{
+    if(p.id==='me') return;
+    p.renderX+=(p.x-p.renderX)*LERP;
+    p.renderY+=(p.y-p.renderY)*LERP;
+  });
+
+  // Draw
+  ctx.clearRect(0,0,W,H);
+  drawMap(ctx);
+  Object.values(players).forEach(p=>{ if(p.id!=='me') drawPlayer(ctx,p,false); });
+  if(players['me']) drawPlayer(ctx,players['me'],true);
+
+  requestAnimationFrame(tick);
+}
+
+// ── WAVE TOAST ────────────────────────────────────────────────────────────────
+function showWave(fromName) {
+  document.getElementById('wave-text').innerHTML = `<strong>${fromName}</strong> waved at you!`;
+  const t = document.getElementById('wave-toast');
+  t.style.display='flex';
+  if(waveTimeout) clearTimeout(waveTimeout);
+  waveTimeout = setTimeout(dismissWave, 6000);
+}
+function dismissWave() {
+  document.getElementById('wave-toast').style.display='none';
+}
+
+// ── STATUS CYCLE (demo) ───────────────────────────────────────────────────────
+function cycleStatus() {
+  statusIdx = (statusIdx+1) % STATUSES.length;
+  const s = STATUSES[statusIdx];
+  if(self) self.status = s;
+  if(players['me']) players['me'].status = s;
+  document.getElementById('status-btn').textContent = s || '+ status';
+}
+</script>
+</body>
+</html>
