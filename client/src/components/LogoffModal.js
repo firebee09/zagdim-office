@@ -33,13 +33,7 @@ export default function LogoffModal({ playerName, nowLog, onConfirm, onCancel })
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleEmail = () => {
-    const subject = encodeURIComponent(`Work log — ${formatDate()}`);
-    const body = encodeURIComponent(buildLogText());
-    window.open(`mailto:?subject=${subject}&body=${body}`);
-  };
-
-  return (
+return (
     <div style={styles.overlay}>
       <div style={styles.modal}>
 
@@ -75,13 +69,10 @@ export default function LogoffModal({ playerName, nowLog, onConfirm, onCancel })
           )}
         </div>
 
-        {/* Email / copy actions */}
+        {/* Copy action */}
         <div style={styles.shareRow}>
           <button style={styles.copyBtn} onClick={handleCopy}>
             {copied ? '✓ Copied!' : '📋 Copy log'}
-          </button>
-          <button style={styles.emailBtn} onClick={handleEmail}>
-            📧 Open in email
           </button>
         </div>
 
@@ -139,17 +130,9 @@ const styles = {
   },
   logText: { color: '#fff', fontSize: 14 },
   emptyLog: { color: 'rgba(255,255,255,0.3)', fontSize: 13, fontStyle: 'italic' },
-  shareRow: {
-    display: 'flex', gap: 10, marginBottom: 20,
-  },
+  shareRow: { marginBottom: 20 },
   copyBtn: {
-    flex: 1, background: 'rgba(255,255,255,0.07)',
-    border: '1px solid rgba(255,255,255,0.12)',
-    borderRadius: 10, padding: '10px',
-    color: 'rgba(255,255,255,0.7)', fontSize: 13, cursor: 'pointer',
-  },
-  emailBtn: {
-    flex: 1, background: 'rgba(255,255,255,0.07)',
+    width: '100%', background: 'rgba(255,255,255,0.07)',
     border: '1px solid rgba(255,255,255,0.12)',
     borderRadius: 10, padding: '10px',
     color: 'rgba(255,255,255,0.7)', fontSize: 13, cursor: 'pointer',

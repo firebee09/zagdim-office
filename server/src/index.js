@@ -188,6 +188,21 @@ io.on('connection', (socket) => {
     io.emit('player:nowChanged', { id: socket.id, now: text, nowLog: player.nowLog });
   });
 
+  // ── LOG EDIT / DELETE ────────────────────────────────────────────────────
+  socket.on('player:editLog', ({ index, text }) => {
+    const player = players[socket.id];
+    if (!player || !player.nowLog[index]) return;
+    player.nowLog[index].text = (text || '').slice(0, 120);
+    io.emit('player:nowChanged', { id: socket.id, now: player.now, nowLog: player.nowLog });
+  });
+
+  socket.on('player:deleteLog', ({ index }) => {
+    const player = players[socket.id];
+    if (!player) return;
+    player.nowLog.splice(index, 1);
+    io.emit('player:nowChanged', { id: socket.id, now: player.now, nowLog: player.nowLog });
+  });
+
   // ── SPEECH BUBBLE ────────────────────────────────────────────────────────
   socket.on('player:bubble', ({ bubble }) => {
     const player = players[socket.id];

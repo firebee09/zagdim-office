@@ -44,7 +44,9 @@ export function useSocket(socket, {
   const enterZone  = useCallback((zone)        => socketRef.current.emit('player:enter_zone', { zoneId: zone.id, zoneLabel: zone.label, zoneType: zone.type }), []);
   const leaveZone  = useCallback((zone)        => socketRef.current.emit('player:leave_zone', { zoneId: zone.id, zoneLabel: zone.label, zoneType: zone.type }), []);
   const setBubble  = useCallback((bubble) => socketRef.current.emit('player:bubble', { bubble }), []);
-  const setNow     = useCallback((now)    => socketRef.current.emit('player:now', { now }), []);
+  const setNow     = useCallback((now)           => socketRef.current.emit('player:now', { now }), []);
+  const editLog    = useCallback((index, text)   => socketRef.current.emit('player:editLog', { index, text }), []);
+  const deleteLog  = useCallback((index)         => socketRef.current.emit('player:deleteLog', { index }), []);
 
-  return { move, setStatus, wave, enterZone, leaveZone, setBubble, setNow };
+  return { move, setStatus, wave, enterZone, leaveZone, setBubble, setNow, editLog, deleteLog };
 }

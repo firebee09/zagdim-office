@@ -128,7 +128,7 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
     ]);
   }, []);
 
-  const { move, setStatus: emitStatus, wave, enterZone, leaveZone, setBubble: emitBubble, setNow: emitNow } = useSocket(socket, {
+  const { move, setStatus: emitStatus, wave, enterZone, leaveZone, setBubble: emitBubble, setNow: emitNow, editLog, deleteLog } = useSocket(socket, {
     onInit, onPlayerJoined, onPlayerMoved, onPlayerLeft, onPlayerStatusChanged, onPlayerWaved,
     onZoneUpdated, onZoneEntered, onZoneLeft, onPlayerBubbleChanged, onPlayerNowChanged,
   });
@@ -697,6 +697,8 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
           players={playersState}
           selfId={selfRef.current?.id}
           onClose={() => setShowDashboard(false)}
+          onEditLog={editLog}
+          onDeleteLog={deleteLog}
         />
       )}
 

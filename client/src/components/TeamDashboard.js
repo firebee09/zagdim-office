@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { AVATARS } from '../constants/avatars';
 
 const avatarMap = Object.fromEntries(AVATARS.map(a => [a.id, a]));
@@ -18,7 +19,61 @@ function timeAgo(ts) {
   return `${hrs}h ${rem}m online`;
 }
 
-export default function TeamDashboard({ players, selfId, onClose }) {
+function LogEntry({ entry, index, isSelf, onEdit, onDelete }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(entry.text);
+
+  if (editing) {
+    return (
+      <div style={logStyles.editRow}>
+        <input
+          style={logStyles.editInput}
+          value={draft}
+          maxLength={120}
+          autoFocus
+          onChange={e => setDraft(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') { onEdit(index, draft); setEditing(false); }
+            if (e.key === 'Escape') setEditing(false);
+          }}
+        />
+        <button style={logStyles.saveBtn} onClick={() => { onEdit(index, draft); setEditing(false); }}>✓</button>
+        <button style={logStyles.cancelBtn} onClick={() => setEditing(false)}>✕</button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={logStyles.row}>
+      <span style={logStyles.time}>{formatTime(entry.time)}</span>
+      <span style={logStyles.text}>{entry.text}</span>
+      {isSelf && (
+        <div style={logStyles.actions}>
+          <button style={logStyles.iconBtn} onClick={() => { setDraft(entry.text); setEditing(true); }} title="Edit">✏️</button>
+          <button style={logStyles.iconBtn} onClick={() => onDelete(index)} title="Delete">🗑️</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const logStyles = {
+  row: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, group: true },
+  time: { color: 'rgba(255,255,255,0.25)', fontSize: 10, flexShrink: 0, fontVariantNumeric: 'tabular-nums' },
+  text: { color: 'rgba(255,255,255,0.7)', fontSize: 12, flex: 1 },
+  actions: { display: 'flex', gap: 2, opacity: 0.5 },
+  iconBtn: { background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, padding: '2px 3px' },
+  editRow: { display: 'flex', gap: 4, marginBottom: 6, alignItems: 'center' },
+  editInput: {
+    flex: 1, background: 'rgba(255,255,255,0.08)',
+    border: '1px solid rgba(255,255,255,0.2)', borderRadius: 6,
+    padding: '3px 8px', color: '#fff', fontSize: 12, outline: 'none',
+  },
+  saveBtn: { background: '#6C63FF', border: 'none', borderRadius: 5, padding: '3px 8px', color: '#fff', fontSize: 11, cursor: 'pointer' },
+  cancelBtn: { background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 5, padding: '3px 8px', color: 'rgba(255,255,255,0.5)', fontSize: 11, cursor: 'pointer' },
+};
+
+export default function TeamDashboard({ players, selfId, onClose, onEditLog, onDeleteLog }) {
   const list = Object.values(players).sort((a, b) => {
     // Self first, then by join time
     if (a.id === selfId) return -1;
@@ -73,21 +128,27 @@ export default function TeamDashboard({ players, selfId, onClose }) {
                   )}
                 </div>
 
-                {/* Today's work log — show last 5, summarise the rest */}
+                {/* Today's work log */}
                 {p.nowLog && p.nowLog.length > 0 && (
                   <div style={styles.logSection}>
-                    <div style={styles.logTitle}>Today's log</div>
-                    {[...p.nowLog].reverse().slice(0, 5).map((entry, i) => (
-                      <div key={i} style={styles.logEntry}>
-                        <span style={styles.logTime}>{formatTime(entry.time)}</span>
-                        <span style={styles.logText}>{entry.text}</span>
-                      </div>
-                    ))}
-                    {p.nowLog.length > 5 && (
-                      <div style={styles.logMore}>
-                        + {p.nowLog.length - 5} more earlier today
-                      </div>
-                    )}
+                    <div style={styles.logTitle}>
+                      Today's log
+                      <span style={styles.count}>{p.nowLog.length} items</span>
+                    </div>
+                    {[...p.nowLog].reverse().map((entry, i) => {
+                      // Reverse index back to original for server operations
+                      const originalIndex = p.nowLog.length - 1 - i;
+                      return (
+                        <LogEntry
+                          key={i}
+                          entry={entry}
+                          index={originalIndex}
+                          isSelf={isSelf}
+                          onEdit={onEditLog}
+                          onDelete={onDeleteLog}
+                        />
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -185,22 +246,10 @@ const styles = {
   logTitle: {
     color: 'rgba(255,255,255,0.3)', fontSize: 10,
     fontWeight: 700, letterSpacing: 1,
-    textTransform: 'uppercase', marginBottom: 6,
+    textTransform: 'uppercase', marginBottom: 8,
+    display: 'flex', justifyContent: 'space-between',
   },
-  logEntry: {
-    display: 'flex', gap: 8, alignItems: 'baseline', marginBottom: 4,
-  },
-  logTime: {
-    color: 'rgba(255,255,255,0.25)', fontSize: 10,
-    flexShrink: 0, fontVariantNumeric: 'tabular-nums',
-  },
-  logText: {
-    color: 'rgba(255,255,255,0.55)', fontSize: 12,
-  },
-  logMore: {
-    color: 'rgba(255,255,255,0.2)', fontSize: 11,
-    fontStyle: 'italic', marginTop: 4,
-  },
+  count: { color: 'rgba(255,255,255,0.2)', fontWeight: 400 },
   hint: {
     color: 'rgba(255,255,255,0.2)', fontSize: 11,
     textAlign: 'center', marginTop: 16,
