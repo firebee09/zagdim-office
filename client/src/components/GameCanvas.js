@@ -57,6 +57,7 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
 
   const onPlayerJoined = useCallback((p) => {
     playersRef.current[p.id] = { ...p, renderX: p.x, renderY: p.y };
+    audio.playJoin();
   }, []);
 
   const onPlayerMoved = useCallback(({ id, x, y }) => {
@@ -65,6 +66,7 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
   }, []);
 
   const onPlayerLeft = useCallback(({ id }) => {
+    if (playersRef.current[id]) audio.playLeave();
     delete playersRef.current[id];
   }, []);
 

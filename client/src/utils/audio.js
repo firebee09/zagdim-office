@@ -4,7 +4,7 @@ class AudioManager {
   constructor() {
     this._ctx = null;
     this._lastFootstep = 0;
-    this.FOOTSTEP_INTERVAL = 380; // ms between footstep sounds
+    this.FOOTSTEP_INTERVAL = 380;
   }
 
   _getCtx() {
@@ -66,6 +66,50 @@ class AudioManager {
 
       osc.start(t);
       osc.stop(t + 0.13);
+    } catch (e) { /* silent */ }
+  }
+
+  // 🎉 Someone joined the office
+  playJoin() {
+    try {
+      const ctx = this._getCtx();
+      const t = ctx.currentTime;
+      // Three quick ascending notes — cheerful "bloop bloop bloop"
+      [[440, 0], [550, 0.12], [660, 0.24]].forEach(([freq, delay]) => {
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t + delay);
+        gain.gain.setValueAtTime(0, t + delay);
+        gain.gain.linearRampToValueAtTime(0.2, t + delay + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.18);
+        osc.start(t + delay);
+        osc.stop(t + delay + 0.2);
+      });
+    } catch (e) { /* silent */ }
+  }
+
+  // 👋 Someone left the office
+  playLeave() {
+    try {
+      const ctx = this._getCtx();
+      const t = ctx.currentTime;
+      // Two descending notes — gentle "bye bye"
+      [[440, 0], [330, 0.15]].forEach(([freq, delay]) => {
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t + delay);
+        gain.gain.setValueAtTime(0, t + delay);
+        gain.gain.linearRampToValueAtTime(0.15, t + delay + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.25);
+        osc.start(t + delay);
+        osc.stop(t + delay + 0.28);
+      });
     } catch (e) { /* silent */ }
   }
 }
