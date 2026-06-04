@@ -4,7 +4,7 @@ export function useSocket(socket, {
   onInit, onPlayerJoined, onPlayerMoved, onPlayerLeft,
   onPlayerStatusChanged, onPlayerWaved,
   onZoneUpdated, onZoneEntered, onZoneLeft,
-  onPlayerBubbleChanged,
+  onPlayerBubbleChanged, onPlayerNowChanged,
 }) {
   const socketRef = useRef(socket);
 
@@ -20,6 +20,7 @@ export function useSocket(socket, {
     s.on('zone:entered', onZoneEntered);
     s.on('zone:left', onZoneLeft);
     s.on('player:bubbleChanged', onPlayerBubbleChanged);
+    s.on('player:nowChanged', onPlayerNowChanged);
 
     return () => {
       s.off('init', onInit);
@@ -32,6 +33,7 @@ export function useSocket(socket, {
       s.off('zone:entered', onZoneEntered);
       s.off('zone:left', onZoneLeft);
       s.off('player:bubbleChanged', onPlayerBubbleChanged);
+      s.off('player:nowChanged', onPlayerNowChanged);
       // Socket lifecycle is managed by App.js — do not disconnect here
     };
   }, []);
@@ -41,7 +43,8 @@ export function useSocket(socket, {
   const wave       = useCallback((targetId)    => socketRef.current.emit('player:wave', { targetId }), []);
   const enterZone  = useCallback((zone)        => socketRef.current.emit('player:enter_zone', { zoneId: zone.id, zoneLabel: zone.label, zoneType: zone.type }), []);
   const leaveZone  = useCallback((zone)        => socketRef.current.emit('player:leave_zone', { zoneId: zone.id, zoneLabel: zone.label, zoneType: zone.type }), []);
-  const setBubble  = useCallback((bubble)      => socketRef.current.emit('player:bubble', { bubble }), []);
+  const setBubble  = useCallback((bubble) => socketRef.current.emit('player:bubble', { bubble }), []);
+  const setNow     = useCallback((now)    => socketRef.current.emit('player:now', { now }), []);
 
-  return { move, setStatus, wave, enterZone, leaveZone, setBubble };
+  return { move, setStatus, wave, enterZone, leaveZone, setBubble, setNow };
 }

@@ -6,6 +6,7 @@ import { useSocket } from '../hooks/useSocket';
 import WaveNotification from './WaveNotification';
 import RoomNotification from './RoomNotification';
 import BubbleInput from './BubbleInput';
+import NowInput from './NowInput';
 import StatusBar from './StatusBar';
 
 const SPEED = 3;          // pixels per frame
@@ -30,6 +31,8 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
   const [status, setStatus] = useState('');
   const [bubble, setBubbleText] = useState('');
   const [showBubbleInput, setShowBubbleInput] = useState(false);
+  const [nowText, setNowText] = useState('');
+  const [showNowInput, setShowNowInput] = useState(false);
   const [waveNotifs, setWaveNotifs] = useState([]);
   const [roomNotifs, setRoomNotifs] = useState([]);
   const [walkTarget, setWalkTarget] = useState(null);
@@ -88,6 +91,11 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
     if (p) p.bubble = b;
   }, []);
 
+  const onPlayerNowChanged = useCallback(({ id, now }) => {
+    const p = playersRef.current[id];
+    if (p) p.now = now;
+  }, []);
+
   const onZoneUpdated = useCallback(({ zoneId, occupants }) => {
     zoneOccupantsRef.current[zoneId] = occupants;
   }, []);
@@ -106,9 +114,9 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
     ]);
   }, []);
 
-  const { move, setStatus: emitStatus, wave, enterZone, leaveZone, setBubble: emitBubble } = useSocket(socket, {
+  const { move, setStatus: emitStatus, wave, enterZone, leaveZone, setBubble: emitBubble, setNow: emitNow } = useSocket(socket, {
     onInit, onPlayerJoined, onPlayerMoved, onPlayerLeft, onPlayerStatusChanged, onPlayerWaved,
-    onZoneUpdated, onZoneEntered, onZoneLeft, onPlayerBubbleChanged,
+    onZoneUpdated, onZoneEntered, onZoneLeft, onPlayerBubbleChanged, onPlayerNowChanged,
   });
 
   // Request fresh state on mount AND every 3 seconds as a safety net
@@ -152,6 +160,13 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
         if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
           e.preventDefault();
           setShowBubbleInput(true);
+          return;
+        }
+      }
+      if (e.key === 'n' || e.key === 'N') {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          setShowNowInput(true);
           return;
         }
       }
@@ -309,6 +324,29 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
             ctx.fillText('👋', x + AVATAR_RADIUS, y - AVATAR_RADIUS);
           }
         }
+      }
+
+      // ── 🧠 Now label (persistent work focus) ──
+      if (p.now) {
+        const nowLabel = `🧠 ${p.now}`;
+        ctx.font = 'bold 12px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        const nW = Math.min(ctx.measureText(nowLabel).width + 20, 240);
+        const nH = 22;
+        const nX = x - nW / 2;
+        const nY = y - AVATAR_RADIUS - 34;
+
+        // Amber/purple pill background
+        ctx.fillStyle = 'rgba(124,58,237,0.85)';
+        ctx.beginPath();
+        ctx.roundRect(nX, nY, nW, nH, 11);
+        ctx.fill();
+
+        ctx.fillStyle = '#fff';
+        // Truncate if too long
+        const maxChars = 28;
+        const display = nowLabel.length > maxChars ? nowLabel.slice(0, maxChars) + '…' : nowLabel;
+        ctx.fillText(display, x, nY + 15);
       }
 
       // ── Speech bubble ──
@@ -606,6 +644,8 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
         onStatusChange={handleStatusChange}
         currentBubble={bubble}
         onOpenBubble={() => setShowBubbleInput(true)}
+        currentNow={nowText}
+        onOpenNow={() => setShowNowInput(true)}
       />
 
       <WaveNotification
@@ -618,6 +658,21 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
         notifications={roomNotifs}
         onDismiss={(id) => setRoomNotifs((prev) => prev.filter((n) => n.id !== id))}
       />
+
+      {showNowInput && (
+        <NowInput
+          currentNow={nowText}
+          onSubmit={(text) => {
+            setNowText(text);
+            emitNow(text);
+            const self = selfRef.current;
+            if (self && playersRef.current[self.id]) {
+              playersRef.current[self.id].now = text;
+            }
+          }}
+          onClose={() => setShowNowInput(false)}
+        />
+      )}
 
       {showBubbleInput && (
         <BubbleInput

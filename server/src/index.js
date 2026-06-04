@@ -73,6 +73,7 @@ io.on('connection', (socket) => {
       y: MAP_CONFIG.spawnY + Math.random() * 80,
       status: '',
       bubble: '',
+      now: '',
     };
 
     // Send this player the full current state
@@ -169,6 +170,14 @@ io.on('connection', (socket) => {
         occupants,
       });
     }
+  });
+
+  // ── NOW (what I'm working on) ─────────────────────────────────────────────
+  socket.on('player:now', ({ now }) => {
+    const player = players[socket.id];
+    if (!player) return;
+    player.now = (now || '').slice(0, 120);
+    io.emit('player:nowChanged', { id: socket.id, now: player.now });
   });
 
   // ── SPEECH BUBBLE ────────────────────────────────────────────────────────

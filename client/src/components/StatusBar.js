@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function StatusBar({ playerName, currentStatus, onStatusChange, onOpenBubble, currentBubble }) {
+export default function StatusBar({ playerName, currentStatus, onStatusChange, onOpenBubble, currentBubble, onOpenNow, currentNow }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(currentStatus || '');
 
@@ -44,11 +44,15 @@ export default function StatusBar({ playerName, currentStatus, onStatusChange, o
         </button>
       )}
 
+      <button style={styles.nowBtn} onClick={onOpenNow} title="Press N">
+        🧠 {currentNow ? `${currentNow.slice(0, 24)}${currentNow.length > 24 ? '…' : ''}` : 'Now'}
+      </button>
+
       <button style={styles.bubbleBtn} onClick={onOpenBubble} title="Press T">
         💬 {currentBubble ? `"${currentBubble.slice(0, 24)}${currentBubble.length > 24 ? '…' : ''}"` : 'Say something'}
       </button>
 
-      <span style={styles.hint}>WASD / ↑↓←→ move &nbsp;·&nbsp; T = speak &nbsp;·&nbsp; Click = wave</span>
+      <span style={styles.hint}>WASD / ↑↓←→ move &nbsp;·&nbsp; N = 🧠 Now &nbsp;·&nbsp; T = 💬 speak &nbsp;·&nbsp; Click = wave</span>
     </div>
   );
 }
@@ -91,6 +95,13 @@ const styles = {
   cancelBtn: {
     background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
     borderRadius: 7, padding: '5px 10px', color: 'rgba(255,255,255,0.5)', fontSize: 12, cursor: 'pointer',
+  },
+  nowBtn: {
+    background: 'rgba(124,58,237,0.2)',
+    border: '1px solid rgba(124,58,237,0.4)',
+    borderRadius: 8, padding: '5px 14px',
+    color: 'rgba(255,255,255,0.9)', fontSize: 13, cursor: 'pointer',
+    whiteSpace: 'nowrap', fontWeight: 600,
   },
   bubbleBtn: {
     background: 'rgba(108,99,255,0.15)',
