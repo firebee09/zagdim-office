@@ -19,11 +19,19 @@ export default function StatusBar({ playerName, onOpenBubble, onOpenNow, onOpenD
         📋 Work Logs 工作誌
       </button>
 
-      <span style={styles.hint}>WASD move &nbsp;·&nbsp; D = logs &nbsp;·&nbsp; N = focus &nbsp;·&nbsp; T = chat &nbsp;·&nbsp; Click = wave</span>
+      <span style={styles.hint} className="zagdim-hint">
+        WASD move &nbsp;·&nbsp; D = logs &nbsp;·&nbsp; N = focus &nbsp;·&nbsp; T = chat &nbsp;·&nbsp; Click = wave
+      </span>
 
       <button style={styles.leaveBtn} onClick={onLeave} title="Leave office">
         🚪 Leave
       </button>
+
+      <style>{`
+        @media (max-width: 1100px) {
+          .zagdim-hint { display: none !important; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -34,9 +42,10 @@ const styles = {
     background: 'rgba(10,10,25,0.92)',
     backdropFilter: 'blur(12px)',
     borderTop: '1px solid rgba(255,255,255,0.08)',
-    display: 'flex', alignItems: 'center', gap: 12,
-    padding: '14px 24px',
-    zIndex: 50, height: 64,
+    display: 'flex', alignItems: 'center', gap: 10,
+    padding: '12px 18px',
+    zIndex: 50, minHeight: 64,
+    flexWrap: 'wrap',
   },
   name: {
     color: '#fff', fontWeight: 700, fontSize: 15,
@@ -66,6 +75,7 @@ const styles = {
   hint: {
     marginLeft: 'auto', color: 'rgba(255,255,255,0.3)',
     fontSize: 12, whiteSpace: 'nowrap',
+    overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0,
   },
   celebrateBtn: {
     background: 'linear-gradient(135deg, rgba(255,180,0,0.25), rgba(255,100,0,0.2))',
@@ -80,5 +90,6 @@ const styles = {
     borderRadius: 10, padding: '9px 18px',
     color: 'rgba(255,150,150,0.9)', fontSize: 14,
     cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+    marginLeft: 'auto',
   },
 };
