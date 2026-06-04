@@ -22,14 +22,14 @@ export default function BubbleInput({ currentBubble, onSubmit, onClose }) {
   };
 
   const QUICK = [
-    '☕ Making coffee',
-    '🍱 Having lunch',
-    '📞 On a call',
-    '🎯 Deep focus',
-    '🗓️ In a meeting',
-    '💤 BRB',
-    '✅ Just finished!',
-    '🔥 Crunch mode',
+    'Help help help! 🆘',
+    "What's up? 何事？",
+    'Free for a call now? 📞',
+    "I'm busy 🙅",
+    'Today is a beautiful day ☀️',
+    'OMG 😱',
+    'I wanna dance 🕺',
+    'Ahhhhh 😤',
   ];
 
   return (
@@ -41,11 +41,12 @@ export default function BubbleInput({ currentBubble, onSubmit, onClose }) {
           <button style={styles.close} onClick={onClose}>✕</button>
         </div>
 
-        <input
+        <textarea
           ref={inputRef}
           style={styles.input}
           value={text}
           maxLength={120}
+          rows={3}
           placeholder="Type a message... (Enter to send, Esc to cancel)"
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKey}
@@ -104,8 +105,10 @@ const styles = {
     width: '100%',
     background: 'rgba(255,255,255,0.07)',
     border: '1px solid rgba(255,255,255,0.15)',
-    borderRadius: 10, padding: '12px 14px',
-    color: '#fff', fontSize: 15, outline: 'none', marginBottom: 16,
+    borderRadius: 10, padding: '14px 16px',
+    color: '#fff', fontSize: 15, outline: 'none',
+    marginBottom: 16, resize: 'none', lineHeight: 1.5,
+    fontFamily: '"Segoe UI", sans-serif',
   },
   quickRow: {
     display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20,

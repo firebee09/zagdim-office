@@ -15,18 +15,6 @@ export default function NowInput({ currentNow, onSubmit, onClose }) {
     if (e.key === 'Escape') onClose();
   };
 
-  const QUICK = [
-    'Writing code',
-    'In a design review',
-    'Reviewing PRs',
-    'Planning sprint',
-    'Fixing a bug',
-    'Writing docs',
-    'Client call',
-    'Deep research',
-    'Brainstorming',
-    'Wrapping up for the day',
-  ];
 
   return (
     <div style={styles.overlay}>
@@ -34,8 +22,8 @@ export default function NowInput({ currentNow, onSubmit, onClose }) {
         <div style={styles.header}>
           <span style={styles.icon}>🧠</span>
           <div>
-            <div style={styles.title}>What are you working on?</div>
-            <div style={styles.subtitle}>Visible to your whole team</div>
+            <div style={styles.title}>Now Focus 正在搞</div>
+            <div style={styles.subtitle}>What are you working on right now?</div>
           </div>
           <button style={styles.close} onClick={onClose}>✕</button>
         </div>
@@ -45,26 +33,21 @@ export default function NowInput({ currentNow, onSubmit, onClose }) {
           style={styles.input}
           value={text}
           maxLength={120}
-          placeholder="e.g. Building the social media feature..."
+          placeholder="e.g. Fixing login bug on mobile, building checkout flow..."
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKey}
         />
 
-        <div style={styles.quickRow}>
-          {QUICK.map((q) => (
-            <button key={q} style={styles.quickBtn}
-              onClick={() => { onSubmit(q); onClose(); }}>
-              {q}
-            </button>
-          ))}
-        </div>
+        <p style={styles.guide}>
+          Be specific — your teammates will see this in real time and in the work log at the end of the day.
+        </p>
 
         <div style={styles.footer}>
           <button style={styles.clearBtn} onClick={() => { onSubmit(''); onClose(); }}>
             Clear
           </button>
           <button style={styles.sendBtn} onClick={() => { onSubmit(text.trim()); onClose(); }}>
-            Set 🧠 Now ↵
+            🧠 Log Focus ↵
           </button>
         </div>
       </div>
@@ -102,14 +85,9 @@ const styles = {
     borderRadius: 10, padding: '12px 14px',
     color: '#fff', fontSize: 15, outline: 'none', marginBottom: 16,
   },
-  quickRow: {
-    display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20,
-  },
-  quickBtn: {
-    background: 'rgba(139,92,246,0.1)',
-    border: '1px solid rgba(139,92,246,0.2)',
-    borderRadius: 20, padding: '5px 12px',
-    color: 'rgba(255,255,255,0.7)', fontSize: 12, cursor: 'pointer',
+  guide: {
+    color: 'rgba(255,255,255,0.35)', fontSize: 12,
+    lineHeight: 1.5, marginBottom: 20, marginTop: -8,
   },
   footer: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
   clearBtn: {

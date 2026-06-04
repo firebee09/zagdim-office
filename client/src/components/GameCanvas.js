@@ -659,11 +659,7 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
 
       <StatusBar
         playerName={playerName}
-        currentStatus={status}
-        onStatusChange={handleStatusChange}
-        currentBubble={bubble}
         onOpenBubble={() => setShowBubbleInput(true)}
-        currentNow={nowText}
         onOpenNow={() => setShowNowInput(true)}
         onOpenDashboard={() => { setShowDashboard(p => !p); syncPlayers(); }}
         onLeave={() => setShowLogoff(true)}
