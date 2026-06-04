@@ -7,6 +7,7 @@ import WaveNotification from './WaveNotification';
 import RoomNotification from './RoomNotification';
 import BubbleInput from './BubbleInput';
 import NowInput from './NowInput';
+import TeamDashboard from './TeamDashboard';
 import StatusBar from './StatusBar';
 
 const SPEED = 3;          // pixels per frame
@@ -33,6 +34,8 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
   const [showBubbleInput, setShowBubbleInput] = useState(false);
   const [nowText, setNowText] = useState('');
   const [showNowInput, setShowNowInput] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [playersState, setPlayersState] = useState({});
   const [waveNotifs, setWaveNotifs] = useState([]);
   const [roomNotifs, setRoomNotifs] = useState([]);
   const [walkTarget, setWalkTarget] = useState(null);
@@ -48,6 +51,12 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
     });
   }
 
+  // Helper to sync playersRef → playersState for dashboard
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const syncPlayers = useCallback(() => {
+    setPlayersState({ ...playersRef.current });
+  }, []);
+
   // ── Socket callbacks ──────────────────────────────────────────────────────
   const onInit = useCallback(({ mapConfig, self: selfId, players }) => {
     mapConfigRef.current = mapConfig;
@@ -56,12 +65,14 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
       playersRef.current[p.id] = { ...p, renderX: p.x, renderY: p.y };
       if (p.id === selfId) selfRef.current = { ...p };
     });
-  }, []);
+    syncPlayers();
+  }, [syncPlayers]);
 
   const onPlayerJoined = useCallback((p) => {
     playersRef.current[p.id] = { ...p, renderX: p.x, renderY: p.y };
     audio.playJoin();
-  }, []);
+    syncPlayers();
+  }, [syncPlayers]);
 
   const onPlayerMoved = useCallback(({ id, x, y }) => {
     const p = playersRef.current[id];
@@ -71,7 +82,8 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
   const onPlayerLeft = useCallback(({ id }) => {
     if (playersRef.current[id]) audio.playLeave();
     delete playersRef.current[id];
-  }, []);
+    syncPlayers();
+  }, [syncPlayers]);
 
   const onPlayerStatusChanged = useCallback(({ id, status: s }) => {
     const p = playersRef.current[id];
@@ -94,7 +106,8 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
   const onPlayerNowChanged = useCallback(({ id, now }) => {
     const p = playersRef.current[id];
     if (p) p.now = now;
-  }, []);
+    syncPlayers();
+  }, [syncPlayers]);
 
   const onZoneUpdated = useCallback(({ zoneId, occupants }) => {
     zoneOccupantsRef.current[zoneId] = occupants;
@@ -167,6 +180,14 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
         if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
           e.preventDefault();
           setShowNowInput(true);
+          return;
+        }
+      }
+      if (e.key === 'd' || e.key === 'D') {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          setShowDashboard(prev => !prev);
+          syncPlayers();
           return;
         }
       }
@@ -646,6 +667,7 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
         onOpenBubble={() => setShowBubbleInput(true)}
         currentNow={nowText}
         onOpenNow={() => setShowNowInput(true)}
+        onOpenDashboard={() => { setShowDashboard(p => !p); syncPlayers(); }}
       />
 
       <WaveNotification
@@ -658,6 +680,14 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
         notifications={roomNotifs}
         onDismiss={(id) => setRoomNotifs((prev) => prev.filter((n) => n.id !== id))}
       />
+
+      {showDashboard && (
+        <TeamDashboard
+          players={playersState}
+          selfId={selfRef.current?.id}
+          onClose={() => setShowDashboard(false)}
+        />
+      )}
 
       {showNowInput && (
         <NowInput

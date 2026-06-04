@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function StatusBar({ playerName, currentStatus, onStatusChange, onOpenBubble, currentBubble, onOpenNow, currentNow }) {
+export default function StatusBar({ playerName, currentStatus, onStatusChange, onOpenBubble, currentBubble, onOpenNow, currentNow, onOpenDashboard }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(currentStatus || '');
 
@@ -52,7 +52,10 @@ export default function StatusBar({ playerName, currentStatus, onStatusChange, o
         💬 {currentBubble ? `"${currentBubble.slice(0, 24)}${currentBubble.length > 24 ? '…' : ''}"` : 'Say something'}
       </button>
 
-      <span style={styles.hint}>WASD / ↑↓←→ move &nbsp;·&nbsp; N = 🧠 Now &nbsp;·&nbsp; T = 💬 speak &nbsp;·&nbsp; Click = wave</span>
+      <button style={styles.dashBtn} onClick={onOpenDashboard} title="Press D">
+        🏢 Team
+      </button>
+      <span style={styles.hint}>WASD move &nbsp;·&nbsp; D = team &nbsp;·&nbsp; N = 🧠 &nbsp;·&nbsp; T = 💬 &nbsp;·&nbsp; Click = wave</span>
     </div>
   );
 }
@@ -95,6 +98,13 @@ const styles = {
   cancelBtn: {
     background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
     borderRadius: 7, padding: '5px 10px', color: 'rgba(255,255,255,0.5)', fontSize: 12, cursor: 'pointer',
+  },
+  dashBtn: {
+    background: 'rgba(255,255,255,0.07)',
+    border: '1px solid rgba(255,255,255,0.12)',
+    borderRadius: 8, padding: '5px 14px',
+    color: 'rgba(255,255,255,0.8)', fontSize: 13, cursor: 'pointer',
+    whiteSpace: 'nowrap',
   },
   nowBtn: {
     background: 'rgba(124,58,237,0.2)',

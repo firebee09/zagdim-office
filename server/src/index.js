@@ -74,6 +74,7 @@ io.on('connection', (socket) => {
       status: '',
       bubble: '',
       now: '',
+      joinedAt: Date.now(),
     };
 
     // Send this player the full current state
