@@ -52,7 +52,6 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
   }
 
   // Helper to sync playersRef → playersState for dashboard
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const syncPlayers = useCallback(() => {
     setPlayersState({ ...playersRef.current });
   }, []);
