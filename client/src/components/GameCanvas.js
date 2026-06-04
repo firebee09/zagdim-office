@@ -8,13 +8,14 @@ import RoomNotification from './RoomNotification';
 import BubbleInput from './BubbleInput';
 import NowInput from './NowInput';
 import TeamDashboard from './TeamDashboard';
+import LogoffModal from './LogoffModal';
 import StatusBar from './StatusBar';
 
 const SPEED = 3;          // pixels per frame
 const LERP = 0.18;        // remote player smoothing factor
 const WAVE_RADIUS = 120;  // px — show wave button inside this distance
 
-export default function GameCanvas({ playerName, avatarId, socket, initData }) {
+export default function GameCanvas({ playerName, avatarId, socket, initData, onLogoff }) {
   const canvasRef = useRef(null);
   const mapImgRef = useRef(null);
   const mapLoadedRef = useRef(false);
@@ -35,6 +36,7 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
   const [nowText, setNowText] = useState('');
   const [showNowInput, setShowNowInput] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
+  const [showLogoff, setShowLogoff] = useState(false);
   const [playersState, setPlayersState] = useState({});
   const [waveNotifs, setWaveNotifs] = useState([]);
   const [roomNotifs, setRoomNotifs] = useState([]);
@@ -664,6 +666,7 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
         currentNow={nowText}
         onOpenNow={() => setShowNowInput(true)}
         onOpenDashboard={() => { setShowDashboard(p => !p); syncPlayers(); }}
+        onLeave={() => setShowLogoff(true)}
       />
 
       <WaveNotification
@@ -676,6 +679,18 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
         notifications={roomNotifs}
         onDismiss={(id) => setRoomNotifs((prev) => prev.filter((n) => n.id !== id))}
       />
+
+      {showLogoff && (
+        <LogoffModal
+          playerName={playerName}
+          nowLog={selfRef.current ? playersRef.current[selfRef.current.id]?.nowLog : []}
+          onConfirm={() => {
+            socket.disconnect();
+            onLogoff();
+          }}
+          onCancel={() => setShowLogoff(false)}
+        />
+      )}
 
       {showDashboard && (
         <TeamDashboard

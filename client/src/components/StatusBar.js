@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function StatusBar({ playerName, currentStatus, onStatusChange, onOpenBubble, currentBubble, onOpenNow, currentNow, onOpenDashboard }) {
+export default function StatusBar({ playerName, currentStatus, onStatusChange, onOpenBubble, currentBubble, onOpenNow, currentNow, onOpenDashboard, onLeave }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(currentStatus || '');
 
@@ -56,6 +56,10 @@ export default function StatusBar({ playerName, currentStatus, onStatusChange, o
         🏢 Team
       </button>
       <span style={styles.hint}>WASD move &nbsp;·&nbsp; D = team &nbsp;·&nbsp; N = 🧠 &nbsp;·&nbsp; T = 💬 &nbsp;·&nbsp; Click = wave</span>
+
+      <button style={styles.leaveBtn} onClick={onLeave} title="Leave office">
+        🚪 Leave
+      </button>
     </div>
   );
 }
@@ -123,5 +127,12 @@ const styles = {
   hint: {
     marginLeft: 'auto', color: 'rgba(255,255,255,0.3)',
     fontSize: 12, whiteSpace: 'nowrap',
+  },
+  leaveBtn: {
+    background: 'rgba(239,68,68,0.15)',
+    border: '1px solid rgba(239,68,68,0.3)',
+    borderRadius: 8, padding: '5px 14px',
+    color: 'rgba(255,150,150,0.9)', fontSize: 13,
+    cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
   },
 };

@@ -62,6 +62,7 @@ export default function App() {
       password={session.password}
       socket={session.socket}
       initData={session.initData}
+      onLogoff={() => setSession(null)}
     />
   );
 }

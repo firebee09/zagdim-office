@@ -73,16 +73,21 @@ export default function TeamDashboard({ players, selfId, onClose }) {
                   )}
                 </div>
 
-                {/* Today's work log */}
+                {/* Today's work log — show last 5, summarise the rest */}
                 {p.nowLog && p.nowLog.length > 0 && (
                   <div style={styles.logSection}>
                     <div style={styles.logTitle}>Today's log</div>
-                    {[...p.nowLog].reverse().map((entry, i) => (
+                    {[...p.nowLog].reverse().slice(0, 5).map((entry, i) => (
                       <div key={i} style={styles.logEntry}>
                         <span style={styles.logTime}>{formatTime(entry.time)}</span>
                         <span style={styles.logText}>{entry.text}</span>
                       </div>
                     ))}
+                    {p.nowLog.length > 5 && (
+                      <div style={styles.logMore}>
+                        + {p.nowLog.length - 5} more earlier today
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -191,6 +196,10 @@ const styles = {
   },
   logText: {
     color: 'rgba(255,255,255,0.55)', fontSize: 12,
+  },
+  logMore: {
+    color: 'rgba(255,255,255,0.2)', fontSize: 11,
+    fontStyle: 'italic', marginTop: 4,
   },
   hint: {
     color: 'rgba(255,255,255,0.2)', fontSize: 11,
