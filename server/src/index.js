@@ -211,6 +211,19 @@ io.on('connection', (socket) => {
     io.emit('player:bubbleChanged', { id: socket.id, bubble: player.bubble });
   });
 
+  // ── CELEBRATE ────────────────────────────────────────────────────────────
+  socket.on('player:celebrate', () => {
+    const player = players[socket.id];
+    if (!player) return;
+    io.emit('player:celebrated', {
+      id: socket.id,
+      name: player.name,
+      x: player.x,
+      y: player.y,
+    });
+    console.log(`[celebrate] ${player.name} 🎉`);
+  });
+
   // ── WAVE ─────────────────────────────────────────────────────────────────
   socket.on('player:wave', ({ targetId }) => {
     const sender = players[socket.id];

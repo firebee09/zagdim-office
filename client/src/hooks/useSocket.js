@@ -4,7 +4,7 @@ export function useSocket(socket, {
   onInit, onPlayerJoined, onPlayerMoved, onPlayerLeft,
   onPlayerStatusChanged, onPlayerWaved,
   onZoneUpdated, onZoneEntered, onZoneLeft,
-  onPlayerBubbleChanged, onPlayerNowChanged,
+  onPlayerBubbleChanged, onPlayerNowChanged, onPlayerCelebrated,
 }) {
   const socketRef = useRef(socket);
 
@@ -21,6 +21,7 @@ export function useSocket(socket, {
     s.on('zone:left', onZoneLeft);
     s.on('player:bubbleChanged', onPlayerBubbleChanged);
     s.on('player:nowChanged', onPlayerNowChanged);
+    s.on('player:celebrated', onPlayerCelebrated);
 
     return () => {
       s.off('init', onInit);
@@ -34,6 +35,7 @@ export function useSocket(socket, {
       s.off('zone:left', onZoneLeft);
       s.off('player:bubbleChanged', onPlayerBubbleChanged);
       s.off('player:nowChanged', onPlayerNowChanged);
+      s.off('player:celebrated', onPlayerCelebrated);
       // Socket lifecycle is managed by App.js — do not disconnect here
     };
   }, []);
@@ -47,6 +49,7 @@ export function useSocket(socket, {
   const setNow     = useCallback((now)           => socketRef.current.emit('player:now', { now }), []);
   const editLog    = useCallback((index, text)   => socketRef.current.emit('player:editLog', { index, text }), []);
   const deleteLog  = useCallback((index)         => socketRef.current.emit('player:deleteLog', { index }), []);
+  const celebrate  = useCallback(()              => socketRef.current.emit('player:celebrate'), []);
 
-  return { move, setStatus, wave, enterZone, leaveZone, setBubble, setNow, editLog, deleteLog };
+  return { move, setStatus, wave, enterZone, leaveZone, setBubble, setNow, editLog, deleteLog, celebrate };
 }

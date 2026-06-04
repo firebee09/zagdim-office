@@ -1,4 +1,4 @@
-export default function StatusBar({ playerName, onOpenBubble, onOpenNow, onOpenDashboard, onLeave }) {
+export default function StatusBar({ playerName, onOpenBubble, onOpenNow, onOpenDashboard, onLeave, onCelebrate }) {
   return (
     <div style={styles.bar}>
       <span style={styles.name}>{playerName}</span>
@@ -9,6 +9,10 @@ export default function StatusBar({ playerName, onOpenBubble, onOpenNow, onOpenD
 
       <button style={styles.bubbleBtn} onClick={onOpenBubble} title="Press T">
         💬 Say something
+      </button>
+
+      <button style={styles.celebrateBtn} onClick={onCelebrate} title="Celebrate!">
+        🎉 Celebrate!
       </button>
 
       <button style={styles.dashBtn} onClick={onOpenDashboard} title="Press D">
@@ -62,6 +66,13 @@ const styles = {
   hint: {
     marginLeft: 'auto', color: 'rgba(255,255,255,0.3)',
     fontSize: 12, whiteSpace: 'nowrap',
+  },
+  celebrateBtn: {
+    background: 'linear-gradient(135deg, rgba(255,180,0,0.25), rgba(255,100,0,0.2))',
+    border: '1px solid rgba(255,180,0,0.4)',
+    borderRadius: 10, padding: '9px 18px',
+    color: '#FFD700', fontSize: 14, fontWeight: 700,
+    cursor: 'pointer', whiteSpace: 'nowrap',
   },
   leaveBtn: {
     background: 'rgba(239,68,68,0.15)',

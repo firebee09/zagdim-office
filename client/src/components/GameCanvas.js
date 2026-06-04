@@ -41,8 +41,9 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
   const [waveNotifs, setWaveNotifs] = useState([]);
   const [roomNotifs, setRoomNotifs] = useState([]);
   const [walkTarget, setWalkTarget] = useState(null);
-  const currentZoneRef = useRef(null);           // zone the local player is currently in
-  const zoneOccupantsRef = useRef({});           // zoneId → [name, name, ...]
+  const currentZoneRef = useRef(null);
+  const zoneOccupantsRef = useRef({});
+  const confettiRef = useRef([]);  // array of particle bursts [{ x, y, particles[], startTime }]
 
   // ── Seed refs synchronously from initData (before any effects run) ────────
   if (initData && !selfRef.current) {
@@ -99,6 +100,26 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
     ]);
   }, []);
 
+  const spawnConfetti = useCallback((x, y) => {
+    const COLORS = ['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#FF6BFF','#FF9A3C','#fff'];
+    const particles = Array.from({ length: 60 }, () => ({
+      x, y,
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 1.5) * 8,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      size: 4 + Math.random() * 6,
+      angle: Math.random() * Math.PI * 2,
+      spin: (Math.random() - 0.5) * 0.3,
+      gravity: 0.25,
+    }));
+    confettiRef.current.push({ x, y, particles, startTime: Date.now() });
+  }, []);
+
+  const onPlayerCelebrated = useCallback(({ x, y, name }) => {
+    audio.playCelebration();
+    spawnConfetti(x, y);
+  }, [spawnConfetti]);
+
   const onPlayerBubbleChanged = useCallback(({ id, bubble: b }) => {
     const p = playersRef.current[id];
     if (p) p.bubble = b;
@@ -128,9 +149,9 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
     ]);
   }, []);
 
-  const { move, setStatus: emitStatus, wave, enterZone, leaveZone, setBubble: emitBubble, setNow: emitNow, editLog, deleteLog } = useSocket(socket, {
+  const { move, setStatus: emitStatus, wave, enterZone, leaveZone, setBubble: emitBubble, setNow: emitNow, editLog, deleteLog, celebrate } = useSocket(socket, {
     onInit, onPlayerJoined, onPlayerMoved, onPlayerLeft, onPlayerStatusChanged, onPlayerWaved,
-    onZoneUpdated, onZoneEntered, onZoneLeft, onPlayerBubbleChanged, onPlayerNowChanged,
+    onZoneUpdated, onZoneEntered, onZoneLeft, onPlayerBubbleChanged, onPlayerNowChanged, onPlayerCelebrated,
   });
 
   // Request fresh state on mount AND every 3 seconds as a safety net
@@ -236,7 +257,8 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
     const cy = (e.clientY - rect.top) * scaleY;
     const p = getPlayerAtPoint(cx, cy);
     if (p) {
-      wave(p.id);          // clicked another player → wave
+      wave(p.id);
+      audio.playWaveSent(); // sender hears a boop too
     } else {
       setWalkTarget({ x: cx, y: cy }); // clicked empty space → walk there
     }
@@ -627,6 +649,26 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
         drawPlayer(playersRef.current[selfId] || self, true);
       }
 
+      // ── Confetti particles ──
+      const CONFETTI_DURATION = 3000;
+      confettiRef.current = confettiRef.current.filter(burst => Date.now() - burst.startTime < CONFETTI_DURATION);
+      confettiRef.current.forEach(burst => {
+        burst.particles.forEach(p => {
+          p.vy += p.gravity;
+          p.x  += p.vx;
+          p.y  += p.vy;
+          p.angle += p.spin;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, 1 - (Date.now() - burst.startTime) / CONFETTI_DURATION);
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.5);
+          ctx.restore();
+        });
+      });
+      ctx.globalAlpha = 1;
+
       // ── Debug overlay ──
       const playerCount = Object.keys(playersRef.current).length;
       const isConnected = socket.connected;
@@ -663,6 +705,14 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
         onOpenNow={() => setShowNowInput(true)}
         onOpenDashboard={() => { setShowDashboard(p => !p); syncPlayers(); }}
         onLeave={() => setShowLogoff(true)}
+        onCelebrate={() => {
+          const self = selfRef.current;
+          if (self) {
+            spawnConfetti(self.x, self.y);
+            audio.playCelebration();
+            celebrate();
+          }
+        }}
       />
 
       <WaveNotification
