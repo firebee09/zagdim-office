@@ -73,10 +73,16 @@ export default function TeamDashboard({ players, selfId, onClose }) {
                   )}
                 </div>
 
-                {/* Zone if any */}
-                {p.status && p.status.includes('Room') && (
-                  <div style={styles.zoneRow}>
-                    <span style={styles.zoneText}>{p.status}</span>
+                {/* Today's work log */}
+                {p.nowLog && p.nowLog.length > 0 && (
+                  <div style={styles.logSection}>
+                    <div style={styles.logTitle}>Today's log</div>
+                    {[...p.nowLog].reverse().map((entry, i) => (
+                      <div key={i} style={styles.logEntry}>
+                        <span style={styles.logTime}>{formatTime(entry.time)}</span>
+                        <span style={styles.logText}>{entry.text}</span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -165,6 +171,26 @@ const styles = {
     background: 'rgba(255,255,255,0.05)',
     borderRadius: 20, padding: '2px 10px',
     display: 'inline-block',
+  },
+  logSection: {
+    marginTop: 10,
+    borderTop: '1px solid rgba(255,255,255,0.06)',
+    paddingTop: 8,
+  },
+  logTitle: {
+    color: 'rgba(255,255,255,0.3)', fontSize: 10,
+    fontWeight: 700, letterSpacing: 1,
+    textTransform: 'uppercase', marginBottom: 6,
+  },
+  logEntry: {
+    display: 'flex', gap: 8, alignItems: 'baseline', marginBottom: 4,
+  },
+  logTime: {
+    color: 'rgba(255,255,255,0.25)', fontSize: 10,
+    flexShrink: 0, fontVariantNumeric: 'tabular-nums',
+  },
+  logText: {
+    color: 'rgba(255,255,255,0.55)', fontSize: 12,
   },
   hint: {
     color: 'rgba(255,255,255,0.2)', fontSize: 11,

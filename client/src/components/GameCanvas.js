@@ -102,9 +102,9 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
     if (p) p.bubble = b;
   }, []);
 
-  const onPlayerNowChanged = useCallback(({ id, now }) => {
+  const onPlayerNowChanged = useCallback(({ id, now, nowLog }) => {
     const p = playersRef.current[id];
-    if (p) p.now = now;
+    if (p) { p.now = now; if (nowLog) p.nowLog = nowLog; }
     syncPlayers();
   }, [syncPlayers]);
 
@@ -419,26 +419,23 @@ export default function GameCanvas({ playerName, avatarId, socket, initData }) {
         });
       }
 
-      // Name tag + status
+      // Name tag + status — below the avatar
       const label = p.status ? `${p.name}  ${p.status}` : p.name;
-      const tagY = y - AVATAR_RADIUS - 8;
       ctx.font = 'bold 12px "Segoe UI", sans-serif';
       ctx.textAlign = 'center';
       const textWidth = ctx.measureText(label).width;
-      const padX = 8; const padY = 4;
-      const tagX = x - textWidth / 2 - padX;
-      const tagW = textWidth + padX * 2;
-      const tagH = 20;
+      const tpadX = 8; const tH = 20;
+      const tagX = x - textWidth / 2 - tpadX;
+      const tagW = textWidth + tpadX * 2;
+      const tagY = y + AVATAR_RADIUS + 6;
 
-      // Tag background pill
       ctx.fillStyle = isSelf ? 'rgba(108,99,255,0.85)' : 'rgba(10,10,30,0.78)';
       ctx.beginPath();
-      ctx.roundRect(tagX, tagY - tagH + padY, tagW, tagH, 6);
+      ctx.roundRect(tagX, tagY, tagW, tH, 6);
       ctx.fill();
 
-      // Tag text
       ctx.fillStyle = '#fff';
-      ctx.fillText(label, x, tagY - 1);
+      ctx.fillText(label, x, tagY + 14);
     }
 
     function drawZones() {

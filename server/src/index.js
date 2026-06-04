@@ -74,6 +74,7 @@ io.on('connection', (socket) => {
       status: '',
       bubble: '',
       now: '',
+      nowLog: [],   // [ { text, time } ] — today's work log
       joinedAt: Date.now(),
     };
 
@@ -177,8 +178,14 @@ io.on('connection', (socket) => {
   socket.on('player:now', ({ now }) => {
     const player = players[socket.id];
     if (!player) return;
-    player.now = (now || '').slice(0, 120);
-    io.emit('player:nowChanged', { id: socket.id, now: player.now });
+    const text = (now || '').slice(0, 120);
+    player.now = text;
+    // Log non-empty entries (avoid duplicates of last entry)
+    if (text && player.nowLog[player.nowLog.length - 1]?.text !== text) {
+      player.nowLog.push({ text, time: Date.now() });
+      if (player.nowLog.length > 30) player.nowLog.shift();
+    }
+    io.emit('player:nowChanged', { id: socket.id, now: text, nowLog: player.nowLog });
   });
 
   // ── SPEECH BUBBLE ────────────────────────────────────────────────────────
