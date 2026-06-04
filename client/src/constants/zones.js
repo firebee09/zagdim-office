@@ -23,14 +23,12 @@ export const DESK_H = 156;
 //  [Pantry 380×217]          (open walk area)    [Outdoor Park 380×217]
 
 export const ZONE_IMAGES = [
-  { id: 'phone_booth', src: '/phone-booth.png',  x: 0,    y: 0   },
-  { id: 'meeting',     src: '/meeting-room.png', x: 1014, y: 0   },
-  { id: 'pantry',      src: '/pantry.png',        x: 0,    y: 568 },
-  { id: 'outdoor',     src: '/outdoor-park.png', x: 1014, y: 568 },
+  { id: 'workout',     src: '/workout-space.png', x: 0,    y: 0   },
+  { id: 'meeting',     src: '/meeting-room.png',  x: 1014, y: 0   },
+  { id: 'pantry',      src: '/pantry.png',         x: 0,    y: 568 },
+  { id: 'outdoor',     src: '/outdoor-park.png',  x: 1014, y: 568 },
 ];
 
-// Desk 1 — left strip, vertically centred between Phone Booth and Pantry
-// Desks 2,3,4,5 — 2×2 grid in the centre of the screen
 export const DESK_POSITIONS = [
   { id: 'desk1', src: '/desk1.png', x: 10,  y: 264, label: 'Desk 1' },
   { id: 'desk2', src: '/desk2.png', x: 300, y: 40,  label: 'Desk 2' },
@@ -40,11 +38,11 @@ export const DESK_POSITIONS = [
 ];
 
 export const ZONES = [
-  { id: 'phone_booth', label: '📞 Phone Booth',   x: 0,    y: 0,   w: ZONE_W, h: ZONE_H, type: 'area'    },
+  { id: 'workout',     label: '💪 Workout Space', x: 0,    y: 0,   w: ZONE_W, h: ZONE_H, type: 'area'    },
   { id: 'meeting',     label: '🗓️ Meeting Room',  x: 1014, y: 0,   w: ZONE_W, h: ZONE_H, type: 'meeting' },
-  { id: 'pantry',      label: '☕ Office Pantry',  x: 0,    y: 568, w: ZONE_W, h: ZONE_H, type: 'area'    },
-  { id: 'outdoor',     label: '🌿 Outdoor Park',   x: 1014, y: 568, w: ZONE_W, h: ZONE_H, type: 'area'    },
-  { id: 'work_area',   label: '💻 Work Area',      x: 280,  y: 25,  w: 720,    h: 360,    type: 'area'    },
+  { id: 'pantry',      label: '☕ Pantry',          x: 0,    y: 568, w: ZONE_W, h: ZONE_H, type: 'area'    },
+  { id: 'outdoor',     label: '🌿 Nature',          x: 1014, y: 568, w: ZONE_W, h: ZONE_H, type: 'area'    },
+  { id: 'work_area',   label: '💻 Work Area',       x: 280,  y: 25,  w: 720,    h: 360,    type: 'area'    },
 ];
 
 export function getZoneAt(x, y) {
