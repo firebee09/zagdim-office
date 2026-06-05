@@ -370,27 +370,50 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
         }
       }
 
-      // ── 🧠 Now label (persistent work focus) ──
+      // ── 🧠 Now Focus (thinking bubble) ──
       if (p.now) {
         const nowLabel = `🧠 ${p.now}`;
-        ctx.font = 'bold 12px "Segoe UI", sans-serif';
+        ctx.font = 'bold 15px "Segoe UI", sans-serif';
         ctx.textAlign = 'center';
-        const nW = Math.min(ctx.measureText(nowLabel).width + 20, 240);
-        const nH = 22;
-        const nX = x - nW / 2;
-        const nY = y - AVATAR_RADIUS - 34;
 
-        // Amber/purple pill background
-        ctx.fillStyle = 'rgba(124,58,237,0.85)';
+        const maxChars = 36;
+        const display = nowLabel.length > maxChars ? nowLabel.slice(0, maxChars) + '…' : nowLabel;
+        const textW = ctx.measureText(display).width;
+        const nW = Math.min(textW + 28, 280);
+        const nH = 34;
+        const nY = y - AVATAR_RADIUS - 56;
+        const cx = x;
+
+        // Two trailing dots (small to big) — classic thought bubble tail
+        ctx.fillStyle = 'rgba(245,245,255,0.95)';
         ctx.beginPath();
-        ctx.roundRect(nX, nY, nW, nH, 11);
+        ctx.arc(cx - 4, nY + nH + 12, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(cx + 4, nY + nH + 5, 5, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = '#fff';
-        // Truncate if too long
-        const maxChars = 28;
-        const display = nowLabel.length > maxChars ? nowLabel.slice(0, maxChars) + '…' : nowLabel;
-        ctx.fillText(display, x, nY + 15);
+        // Cloud-shaped bubble (rounded rect with extra bumps on top)
+        ctx.fillStyle = 'rgba(245,245,255,0.95)';
+        ctx.beginPath();
+        ctx.roundRect(cx - nW / 2, nY, nW, nH, 17);
+        ctx.fill();
+        // Two top bumps to give cloud feel
+        ctx.beginPath();
+        ctx.arc(cx - nW / 4, nY - 2, 9, 0, Math.PI * 2);
+        ctx.arc(cx + nW / 4, nY - 2, 9, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Subtle border
+        ctx.strokeStyle = 'rgba(139,92,246,0.25)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(cx - nW / 2, nY, nW, nH, 17);
+        ctx.stroke();
+
+        // Text — dark on light
+        ctx.fillStyle = '#3b1e6b';
+        ctx.fillText(display, cx, nY + nH / 2 + 5);
       }
 
       // ── Speech bubble ──
@@ -420,7 +443,9 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
         const bW = Math.min(maxW, Math.max(...lines.map(l => ctx.measureText(l).width))) + padX * 2;
         const bH = lines.length * lineH + padY * 2;
         const bX = x - bW / 2;
-        const bY = y - AVATAR_RADIUS - 14 - bH - 22; // above name tag
+        // Position above the thinking bubble if it exists, else just above avatar
+        const nowOffset = p.now ? 72 : 0;
+        const bY = y - AVATAR_RADIUS - 14 - bH - 22 - nowOffset;
 
         // Bubble background
         ctx.fillStyle = 'rgba(255,255,255,0.95)';

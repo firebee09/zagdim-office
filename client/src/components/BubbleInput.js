@@ -22,14 +22,14 @@ export default function BubbleInput({ currentBubble, onSubmit, onClose }) {
   };
 
   const QUICK = [
-    'Help help help! 🆘',
-    "What's up? 何事？",
-    'Free for a call now? 📞',
-    "I'm busy 🙅",
-    'Today is a beautiful day ☀️',
-    'OMG 😱',
-    'I wanna dance 🕺',
-    'Ahhhhh 😤',
+    '☕ Enjoying my coffee',
+    '🍱 Food time',
+    '✨ Working on some magic',
+    '🎧 In the zone',
+    '💭 Thinking…',
+    '👋 BRB',
+    '🌅 Just arrived',
+    '🚀 Shipping today!',
   ];
 
   return (
