@@ -23,8 +23,8 @@ export default function StatusBar({ playerName, onOpenBubble, onOpenNow, onOpenD
         WASD move &nbsp;·&nbsp; D = logs &nbsp;·&nbsp; N = focus &nbsp;·&nbsp; T = chat &nbsp;·&nbsp; Click = wave
       </span>
 
-      <button style={styles.leaveBtn} onClick={onLeave} title="Leave office">
-        🚪 Leave
+      <button style={styles.leaveBtn} onClick={onLeave} title="Log off">
+        🚪 Log-off 下線啦
       </button>
 
       <style>{`
