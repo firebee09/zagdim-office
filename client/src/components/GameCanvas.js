@@ -398,14 +398,10 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
         ctx.arc(cx + 4, nY + nH + 5, 5, 0, Math.PI * 2);
         ctx.fill();
 
-        // Cloud-shaped bubble
+        // Rounded bubble (no top bumps — keep it clean)
         ctx.fillStyle = BUBBLE_FILL;
         ctx.beginPath();
         ctx.roundRect(cx - nW / 2, nY, nW, nH, 17);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(cx - nW / 4, nY - 2, 9, 0, Math.PI * 2);
-        ctx.arc(cx + nW / 4, nY - 2, 9, 0, Math.PI * 2);
         ctx.fill();
 
         // Soft mint border
