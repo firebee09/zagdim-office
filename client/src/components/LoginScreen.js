@@ -26,10 +26,25 @@ export default function LoginScreen({ onJoin, error }) {
         <form onSubmit={handleSubmit} style={styles.form}>
           {/* Nickname */}
           <label style={styles.label}>Your name</label>
+          <div style={styles.namePresets}>
+            {['Winfield', 'Fiamma', 'Va', 'Elaine', 'Jojo'].map((n) => (
+              <button
+                key={n}
+                type="button"
+                style={{
+                  ...styles.namePreset,
+                  ...(name === n ? styles.namePresetActive : {}),
+                }}
+                onClick={() => setName(n)}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
           <input
             style={styles.input}
             type="text"
-            placeholder="e.g. Alison 🍕"
+            placeholder="…or type a custom name"
             maxLength={24}
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -127,6 +142,28 @@ const styles = {
     fontSize: 16,
     outline: 'none',
     marginBottom: 20,
+  },
+  namePresets: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 10,
+  },
+  namePreset: {
+    background: 'rgba(255,255,255,0.08)',
+    border: '1px solid rgba(255,255,255,0.15)',
+    borderRadius: 20,
+    padding: '6px 14px',
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.15s',
+  },
+  namePresetActive: {
+    background: 'linear-gradient(135deg, #6C63FF, #3ECFCF)',
+    border: '1px solid rgba(108,99,255,0.5)',
+    color: '#fff',
   },
   avatarGrid: {
     display: 'grid',

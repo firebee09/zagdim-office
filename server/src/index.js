@@ -27,6 +27,22 @@ const players = {};
 // zoneOccupants[zoneId] = Set of socketIds
 const zoneOccupants = {};
 
+// Daily logs persist by name across disconnects — survives lunch breaks
+// dailyLogs[name] = { date: 'YYYY-MM-DD', logs: [{ text, time }] }
+const dailyLogs = {};
+
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getDailyLog(name) {
+  const today = todayKey();
+  if (!dailyLogs[name] || dailyLogs[name].date !== today) {
+    dailyLogs[name] = { date: today, logs: [] };
+  }
+  return dailyLogs[name].logs;
+}
+
 // Map config sent to new joiners
 const MAP_CONFIG = {
   width: 1280,
@@ -65,16 +81,19 @@ io.on('connection', (socket) => {
       return;
     }
 
+    const trimmedName = name.slice(0, 24);
+    const restoredLog = getDailyLog(trimmedName);
+
     players[socket.id] = {
       id: socket.id,
-      name: name.slice(0, 24),
+      name: trimmedName,
       avatar,
       x: MAP_CONFIG.spawnX + Math.random() * 80,
       y: MAP_CONFIG.spawnY + Math.random() * 80,
       status: '',
       bubble: '',
       now: '',
-      nowLog: [],   // [ { text, time } ] — today's work log
+      nowLog: restoredLog, // restored from earlier today, if any
       joinedAt: Date.now(),
     };
 
@@ -180,27 +199,33 @@ io.on('connection', (socket) => {
     if (!player) return;
     const text = (now || '').slice(0, 120);
     player.now = text;
-    // Log non-empty entries (avoid duplicates of last entry)
-    if (text && player.nowLog[player.nowLog.length - 1]?.text !== text) {
-      player.nowLog.push({ text, time: Date.now() });
-      if (player.nowLog.length > 30) player.nowLog.shift();
+    const log = getDailyLog(player.name);
+    if (text && log[log.length - 1]?.text !== text) {
+      log.push({ text, time: Date.now() });
+      if (log.length > 50) log.shift();
     }
-    io.emit('player:nowChanged', { id: socket.id, now: text, nowLog: player.nowLog });
+    player.nowLog = log;
+    io.emit('player:nowChanged', { id: socket.id, now: text, nowLog: log });
   });
 
   // ── LOG EDIT / DELETE ────────────────────────────────────────────────────
   socket.on('player:editLog', ({ index, text }) => {
     const player = players[socket.id];
-    if (!player || !player.nowLog[index]) return;
-    player.nowLog[index].text = (text || '').slice(0, 120);
-    io.emit('player:nowChanged', { id: socket.id, now: player.now, nowLog: player.nowLog });
+    if (!player) return;
+    const log = getDailyLog(player.name);
+    if (!log[index]) return;
+    log[index].text = (text || '').slice(0, 120);
+    player.nowLog = log;
+    io.emit('player:nowChanged', { id: socket.id, now: player.now, nowLog: log });
   });
 
   socket.on('player:deleteLog', ({ index }) => {
     const player = players[socket.id];
     if (!player) return;
-    player.nowLog.splice(index, 1);
-    io.emit('player:nowChanged', { id: socket.id, now: player.now, nowLog: player.nowLog });
+    const log = getDailyLog(player.name);
+    log.splice(index, 1);
+    player.nowLog = log;
+    io.emit('player:nowChanged', { id: socket.id, now: player.now, nowLog: log });
   });
 
   // ── SPEECH BUBBLE ────────────────────────────────────────────────────────

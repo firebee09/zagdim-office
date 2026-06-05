@@ -16,7 +16,7 @@ function RoomToast({ notification, onDismiss }) {
 
   useEffect(() => {
     const t1 = setTimeout(() => setVisible(true), 10);
-    const t2 = setTimeout(() => onDismiss(notification.id), 5000);
+    const t2 = setTimeout(() => onDismiss(notification.id), 3000);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [notification.id, onDismiss]);
 

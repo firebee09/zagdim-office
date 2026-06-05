@@ -15,7 +15,7 @@ export default function StatusBar({ playerName, onOpenBubble, onOpenNow, onOpenD
         🎉 Celebrate!
       </button>
 
-      <button style={styles.dashBtn} onClick={onOpenDashboard} title="Press D">
+      <button style={styles.dashBtn} onClick={onOpenDashboard} title="Press D" className="zagdim-logs-btn">
         📋 Work Logs 工作誌
       </button>
 
@@ -30,6 +30,16 @@ export default function StatusBar({ playerName, onOpenBubble, onOpenNow, onOpenD
       <style>{`
         @media (max-width: 1100px) {
           .zagdim-hint { display: none !important; }
+        }
+        @keyframes zagdimPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.45); }
+          50%      { box-shadow: 0 0 0 10px rgba(245,158,11,0); }
+        }
+        .zagdim-logs-btn {
+          animation: zagdimPulse 2.4s ease-out infinite;
+        }
+        .zagdim-logs-btn:hover {
+          animation: none;
         }
       `}</style>
     </div>
@@ -66,10 +76,10 @@ const styles = {
     cursor: 'pointer', whiteSpace: 'nowrap',
   },
   dashBtn: {
-    background: 'rgba(255,255,255,0.07)',
-    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'linear-gradient(135deg, rgba(245,158,11,0.22), rgba(217,119,6,0.18))',
+    border: '1px solid rgba(245,158,11,0.45)',
     borderRadius: 10, padding: '9px 18px',
-    color: 'rgba(255,255,255,0.8)', fontSize: 14,
+    color: '#fcd34d', fontSize: 14, fontWeight: 700,
     cursor: 'pointer', whiteSpace: 'nowrap',
   },
   hint: {
