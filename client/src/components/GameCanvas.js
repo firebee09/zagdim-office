@@ -384,8 +384,13 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
         const nY = y - AVATAR_RADIUS - 56;
         const cx = x;
 
-        // Two trailing dots (small to big) — classic thought bubble tail
-        ctx.fillStyle = 'rgba(245,245,255,0.95)';
+        // Soft mint thought bubble — feels "live/active"
+        const BUBBLE_FILL = 'rgba(209,250,229,0.96)'; // soft mint
+        const BUBBLE_STROKE = 'rgba(16,185,129,0.35)';
+        const TEXT_COLOR = '#065f46';
+
+        // Two trailing dots
+        ctx.fillStyle = BUBBLE_FILL;
         ctx.beginPath();
         ctx.arc(cx - 4, nY + nH + 12, 3, 0, Math.PI * 2);
         ctx.fill();
@@ -393,26 +398,25 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
         ctx.arc(cx + 4, nY + nH + 5, 5, 0, Math.PI * 2);
         ctx.fill();
 
-        // Cloud-shaped bubble (rounded rect with extra bumps on top)
-        ctx.fillStyle = 'rgba(245,245,255,0.95)';
+        // Cloud-shaped bubble
+        ctx.fillStyle = BUBBLE_FILL;
         ctx.beginPath();
         ctx.roundRect(cx - nW / 2, nY, nW, nH, 17);
         ctx.fill();
-        // Two top bumps to give cloud feel
         ctx.beginPath();
         ctx.arc(cx - nW / 4, nY - 2, 9, 0, Math.PI * 2);
         ctx.arc(cx + nW / 4, nY - 2, 9, 0, Math.PI * 2);
         ctx.fill();
 
-        // Subtle border
-        ctx.strokeStyle = 'rgba(139,92,246,0.25)';
+        // Soft mint border
+        ctx.strokeStyle = BUBBLE_STROKE;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.roundRect(cx - nW / 2, nY, nW, nH, 17);
         ctx.stroke();
 
-        // Text — dark on light
-        ctx.fillStyle = '#3b1e6b';
+        // Text
+        ctx.fillStyle = TEXT_COLOR;
         ctx.fillText(display, cx, nY + nH / 2 + 5);
       }
 
@@ -444,8 +448,8 @@ export default function GameCanvas({ playerName, avatarId, socket, initData, onL
         const bH = lines.length * lineH + padY * 2;
         const bX = x - bW / 2;
         // Position above the thinking bubble if it exists, else just above avatar
-        const nowOffset = p.now ? 72 : 0;
-        const bY = y - AVATAR_RADIUS - 14 - bH - 22 - nowOffset;
+        const nowOffset = p.now ? 56 : 0;
+        const bY = y - AVATAR_RADIUS - 14 - bH - 12 - nowOffset;
 
         // Bubble background
         ctx.fillStyle = 'rgba(255,255,255,0.95)';

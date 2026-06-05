@@ -27,7 +27,6 @@ export default function BubbleInput({ currentBubble, onSubmit, onClose }) {
     '✨ Working on some magic',
     '🎵 Music makes me happy',
     '💭 Thinking…',
-    '👋 BRB',
     '☀️ Today is a beautiful day',
     '🕺 I wanna dance',
   ];

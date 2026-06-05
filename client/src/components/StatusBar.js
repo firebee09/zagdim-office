@@ -16,7 +16,7 @@ export default function StatusBar({ playerName, onOpenBubble, onOpenNow, onOpenD
       </button>
 
       <button style={styles.dashBtn} onClick={onOpenDashboard} title="Press D" className="zagdim-logs-btn">
-        📋 Work Logs 工作誌
+        📋 Open Logs
       </button>
 
       <span style={styles.hint} className="zagdim-hint">
@@ -32,11 +32,11 @@ export default function StatusBar({ playerName, onOpenBubble, onOpenNow, onOpenD
           .zagdim-hint { display: none !important; }
         }
         @keyframes zagdimPulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.45); }
-          50%      { box-shadow: 0 0 0 10px rgba(245,158,11,0); }
+          0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.22); }
+          50%      { box-shadow: 0 0 0 6px rgba(245,158,11,0); }
         }
         .zagdim-logs-btn {
-          animation: zagdimPulse 2.4s ease-out infinite;
+          animation: zagdimPulse 3.2s ease-out infinite;
         }
         .zagdim-logs-btn:hover {
           animation: none;
