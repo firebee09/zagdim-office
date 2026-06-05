@@ -25,11 +25,11 @@ export default function BubbleInput({ currentBubble, onSubmit, onClose }) {
     '☕ Enjoying my coffee',
     '🍱 Food time',
     '✨ Working on some magic',
-    '🎧 In the zone',
+    '🎵 Music makes me happy',
     '💭 Thinking…',
     '👋 BRB',
-    '🌅 Just arrived',
-    '🚀 Shipping today!',
+    '☀️ Today is a beautiful day',
+    '🕺 I wanna dance',
   ];
 
   return (
